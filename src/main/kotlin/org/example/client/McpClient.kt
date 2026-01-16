@@ -1,7 +1,6 @@
-package org.example
+package org.example.client
 
 import com.anthropic.client.okhttp.AnthropicOkHttpClient
-import com.anthropic.core.JsonObject
 import com.anthropic.core.JsonValue
 import com.anthropic.models.messages.MessageCreateParams
 import com.anthropic.models.messages.MessageParam
@@ -18,10 +17,11 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.io.asSink
 import kotlinx.io.asSource
 import kotlinx.io.buffered
+import kotlinx.serialization.json.JsonObject
 import kotlin.jvm.optionals.getOrNull
 
 class McpClient : AutoCloseable {
-    private val anthropic = AnthropicOkHttpClient.fromEnv()
+    private val anthropic = AnthropicOkHttpClient.Companion.fromEnv()
     private val mcp: Client = Client(
         Implementation(name = "mcp-client-cli", version = "1.0.0")
     )
@@ -54,15 +54,15 @@ class McpClient : AutoCloseable {
 
             val toolsResult = mcp.listTools()
             tools = toolsResult?.tools?.map { tool ->
-                ToolUnion.ofTool(
-                    Tool.builder()
+                ToolUnion.Companion.ofTool(
+                    Tool.Companion.builder()
                         .name(tool.name)
                         .description(tool.description ?: "")
                         .inputSchema(
                             Tool.InputSchema.builder()
-                                .type(JsonValue.from(tool.inputSchema.type))
+                                .type(JsonValue.Companion.from(tool.inputSchema.type))
                                 .properties(tool.inputSchema.properties.toJsonValue())
-                                .putAdditionalProperty("required", JsonValue.from(tool.inputSchema.required))
+                                .putAdditionalProperty("required", JsonValue.Companion.from(tool.inputSchema.required))
                                 .build()
                         )
                         .build()
@@ -75,20 +75,20 @@ class McpClient : AutoCloseable {
         }
     }
 
-    private fun kotlinx.serialization.json.JsonObject.toJsonValue(): JsonValue {
+    private fun JsonObject.toJsonValue(): JsonValue {
         val mapper = ObjectMapper()
         val node = mapper.readTree(this.toString())
-        return JsonValue.fromJsonNode(node)
+        return JsonValue.Companion.fromJsonNode(node)
     }
 
 
-    private val messageParamsBuilder = MessageCreateParams.builder()
-        .model(Model.CLAUDE_3_7_SONNET_LATEST)
+    private val messageParamsBuilder = MessageCreateParams.Companion.builder()
+        .model(Model.Companion.CLAUDE_3_7_SONNET_LATEST)
         .maxTokens(1024)
 
     suspend fun processQuery(query: String): String {
         val messages = mutableListOf(
-            MessageParam.builder()
+            MessageParam.Companion.builder()
                 .role(MessageParam.Role.USER)
                 .content(query)
                 .build()
@@ -117,7 +117,7 @@ class McpClient : AutoCloseable {
                     finalText.add("[Calling tool $toolName with args $toolArgs]")
 
                     messages.add(
-                        MessageParam.builder()
+                        MessageParam.Companion.builder()
                             .role(MessageParam.Role.USER)
                             .content(
                                 """

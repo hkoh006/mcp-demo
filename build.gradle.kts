@@ -2,6 +2,7 @@ plugins {
     kotlin("jvm") version "2.2.20"
     kotlin("plugin.serialization") version "2.2.20"
     id("com.gradleup.shadow") version "8.3.9"
+    application
 }
 
 group = "org.example"
@@ -31,4 +32,8 @@ tasks.test {
 }
 kotlin {
     jvmToolchain(21)
+}
+
+application {
+    mainClass = "org.example.client.McpClientKt"
 }

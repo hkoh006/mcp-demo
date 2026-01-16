@@ -1,4 +1,4 @@
-package org.example
+package org.example.server
 
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
