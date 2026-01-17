@@ -45,12 +45,19 @@ class McpClient : AutoCloseable {
                 add(serverScriptPath)
             }
             val process = ProcessBuilder(command).start()
+
+            println("Server started with PID ${process.pid()}")
+
             val transport = StdioClientTransport(
                 input = process.inputStream.asSource().buffered(),
                 output = process.outputStream.asSink().buffered()
             )
 
+            println("Connecting to server...")
+
             mcp.connect(transport)
+
+            println("Waiting for server to connect...")
 
             val toolsResult = mcp.listTools()
             tools = toolsResult?.tools?.map { tool ->
@@ -83,7 +90,7 @@ class McpClient : AutoCloseable {
 
 
     private val messageParamsBuilder = MessageCreateParams.Companion.builder()
-        .model(Model.Companion.CLAUDE_3_7_SONNET_LATEST)
+        .model(Model.Companion.CLAUDE_4_SONNET_20250514)
         .maxTokens(1024)
 
     suspend fun processQuery(query: String): String {
@@ -163,8 +170,10 @@ fun main(args: Array<String>) = runBlocking {
     if (args.isEmpty()) throw IllegalArgumentException("Usage: java -jar <your_path>/build/libs/kotlin-mcp-client-0.1.0-all.jar <path_to_server_script>")
     val serverPath = args.first()
     val client = McpClient()
+    println("Connecting to server on path $serverPath...")
     client.use {
         client.connectToServer(serverPath)
+        println("Connected!")
         client.chatLoop()
     }
 }

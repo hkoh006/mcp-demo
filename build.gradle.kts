@@ -15,7 +15,8 @@ repositories {
 val mcpVersion = "0.4.0"
 val slf4jVersion = "2.0.9"
 val ktorVersion = "3.1.1"
-val anthropicVersion = "0.8.0"
+val anthropicVersion = "2.11.1"
+val junitVersion = "5.12.0"
 
 dependencies {
     implementation("io.modelcontextprotocol:kotlin-sdk:$mcpVersion")
@@ -23,8 +24,11 @@ dependencies {
     implementation("io.ktor:ktor-client-content-negotiation:$ktorVersion")
     implementation("io.ktor:ktor-serialization-kotlinx-json:$ktorVersion")
     testImplementation(kotlin("test"))
+    testImplementation("org.junit.jupiter:junit-jupiter-api:$junitVersion")
+    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:$junitVersion")
 
     implementation("com.anthropic:anthropic-java:${anthropicVersion}")
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.10.1")
 }
 
 tasks.test {
@@ -36,4 +40,34 @@ kotlin {
 
 application {
     mainClass = "org.example.client.McpClientKt"
+}
+
+tasks.withType<com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar> {
+    archiveClassifier.set("all")
+}
+
+val shadowJarClient = tasks.register<com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar>("shadowJarClient") {
+    group = "shadow"
+    description = "Builds a shadow jar for the McpClient"
+    from(sourceSets.main.get().output)
+    configurations = listOf(project.configurations.runtimeClasspath.get())
+    manifest {
+        attributes["Main-Class"] = "org.example.client.McpClientKt"
+    }
+    archiveBaseName.set("McpClient")
+}
+
+val shadowJarServer = tasks.register<com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar>("shadowJarServer") {
+    group = "shadow"
+    description = "Builds a shadow jar for the McpServer"
+    from(sourceSets.main.get().output)
+    configurations = listOf(project.configurations.runtimeClasspath.get())
+    manifest {
+        attributes["Main-Class"] = "org.example.server.McpServerKt"
+    }
+    archiveBaseName.set("McpServer")
+}
+
+tasks.build {
+    dependsOn(shadowJarClient, shadowJarServer)
 }
