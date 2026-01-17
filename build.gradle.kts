@@ -12,11 +12,11 @@ repositories {
     mavenCentral()
 }
 
-val mcpVersion = "0.4.0"
-val slf4jVersion = "2.0.9"
-val ktorVersion = "3.1.1"
-val anthropicVersion = "2.11.1"
-val junitVersion = "5.12.0"
+val mcpVersion: String by project
+val slf4jVersion: String by project
+val ktorVersion: String by project
+val anthropicVersion: String by project
+val junitVersion: String by project
 
 dependencies {
     implementation("io.modelcontextprotocol:kotlin-sdk:$mcpVersion")
@@ -27,7 +27,7 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter-api:$junitVersion")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:$junitVersion")
 
-    implementation("com.anthropic:anthropic-java:${anthropicVersion}")
+    implementation("com.anthropic:anthropic-java:$anthropicVersion")
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.10.1")
 }
 
