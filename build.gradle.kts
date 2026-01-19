@@ -1,6 +1,7 @@
 plugins {
     kotlin("jvm") version "2.2.20"
     kotlin("plugin.serialization") version "2.2.20"
+    id("io.ktor.plugin") version "3.2.2"
     id("com.gradleup.shadow") version "8.3.9"
     application
 }
@@ -12,17 +13,17 @@ repositories {
     mavenCentral()
 }
 
-val mcpVersion = "0.4.0"
+val mcpVersion = "0.8.1"
 val slf4jVersion = "2.0.9"
-val ktorVersion = "3.1.1"
 val anthropicVersion = "2.11.1"
 val junitVersion = "5.12.0"
 
 dependencies {
     implementation("io.modelcontextprotocol:kotlin-sdk:$mcpVersion")
     implementation("org.slf4j:slf4j-nop:$slf4jVersion")
-    implementation("io.ktor:ktor-client-content-negotiation:$ktorVersion")
-    implementation("io.ktor:ktor-serialization-kotlinx-json:$ktorVersion")
+    implementation("io.ktor:ktor-server-netty")
+    implementation("io.ktor:ktor-client-content-negotiation")
+    implementation("io.ktor:ktor-serialization-kotlinx-json")
     testImplementation(kotlin("test"))
     testImplementation("org.junit.jupiter:junit-jupiter-api:$junitVersion")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:$junitVersion")
